@@ -1,0 +1,134 @@
+Part B: Predicting the Output
+
+Q1. Dictionary Aliasing
+
+Code:
+
+d = {"a": 1, "b": 2}
+d2 = d
+d2["c"] = 3
+print(len(d))
+
+Output:
+
+3
+
+Explanation:  
+d2 = d does not create a new dictionary. Both variables refer to the same dictionary, so adding "c" through d2 also changes d. The dictionary now has three items.
+
+Q2. Shallow Copy
+
+Code:
+
+d = {"x": [1]}
+e = d.copy()
+e["x"].append(2)
+print(d)
+
+Output:
+
+{'x': [1, 2]}
+
+Explanation:  
+copy() makes a shallow copy. The outer dictionaries are different, but the list stored under "x" is shared by both dictionaries. Appending 2 through e therefore changes the list seen through d as well.
+
+Q3. Dictionary Comprehension with a Condition
+
+Code:
+
+print({k: v for k, v in zip("abc", range(3)) if v})
+
+Output:
+
+{'b': 1, 'c': 2}
+
+Explanation:  
+zip() pairs the letters with the numbers: a with 0, b with 1, and c with 2. The condition if v excludes 0, because zero is treated as false in Python. The other two pairs remain in the dictionary.
+
+Q4. Using setdefault()
+
+Code:
+
+d = {"a": 1}
+print(d.setdefault("a", 9), d.setdefault("b", 5), d)
+
+Output:
+
+1 5 {'a': 1, 'b': 5}
+
+Explanation:  
+The first setdefault() finds that "a" already exists, so it returns 1 and leaves its value unchanged. The second call finds no "b" key, so it adds "b": 5 and returns 5. The dictionary contains both entries afterward.
+
+Q5. Keys That Compare Equal
+
+Code:
+
+d = {1: "a", 1.0: "b", True: "c"}
+print(d, len(d))
+
+Output:
+
+{1: 'c'} 1
+
+Explanation:  
+In Python, 1, 1.0, and True compare equal and have the same hash value. They are therefore treated as the same dictionary key. Each later value replaces the earlier value, leaving one entry with the value "c".
+
+Q6. Deleting an Item While Iterating
+
+Code:
+
+d = {"a": 1, "b": 2, "c": 3}
+for k in d:
+    if d[k] == 2:
+        del d[k]
+
+Result:
+
+RuntimeError: dictionary changed size during iteration
+
+Explanation:  
+The loop is iterating directly over the dictionary while the code deletes an item from it. Changing the dictionary's size during iteration raises a RuntimeError.
+
+A safe way to do this is to iterate over a separate list of the keys:
+
+d = {"a": 1, "b": 2, "c": 3}
+for k in list(d):
+    if d[k] == 2:
+        del d[k]
+
+print(d)
+
+Output of the corrected code:
+
+{'a': 1, 'c': 3}
+
+Q7. Using pop() and popitem()
+
+Code:
+
+d = {"a": 1, "b": 2}
+print(d.pop("z", None), d.popitem())
+
+Output:
+
+None ('b', 2)
+
+Explanation:  
+The key "z" is not present, so pop("z", None) returns None without changing the dictionary. popitem() removes and returns the last inserted key-value pair. In this case, that pair is ("b", 2).
+
+Q8. Reversing Keys and Values
+
+Code:
+
+print({v: k for k, v in {"a": 1, "b": 1}.items()})
+
+Output:
+
+{1: 'b'}
+
+Explanation:  
+The comprehension uses each original value as a new key. Both "a" and "b" have the value 1, so they produce the same key in the new dictionary. The later entry overwrites the earlier one, leaving {1: 'b'}.
+
+Conclusion
+
+These examples show how dictionary assignment and copying work, how dictionary comprehensions apply conditions, and how methods such as setdefault(), pop(), and popitem() behave. They also demonstrate why dictionary keys must be unique and why the dictionary should not be resized while iterating over it.

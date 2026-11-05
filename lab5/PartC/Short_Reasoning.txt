@@ -1,0 +1,85 @@
+Part C: Short Reasoning Questions
+
+1. Why does d2 = d not create a copy, and what is the difference between d.copy() and copy.deepcopy(d) for a nested dictionary? Which one would you use for the student database and why?
+
+Answer:
+When we write d2 = d, both variables refer to the same dictionary in memory. Any change made using d2 is also visible through d. The method d.copy() creates a shallow copy: it creates a new outer dictionary, but nested objects such as lists or dictionaries are still shared. copy.deepcopy(d) creates a separate copy of the dictionary and its nested objects as well.
+
+For the student database, I would use copy.deepcopy() if I needed to make an independent backup or work on a separate version of all student records. Changes to nested subject marks in the copied database would then not affect the original. If I only needed a new outer dictionary and did not plan to modify nested data, d.copy() would be enough.
+
+
+2. Why must dictionary keys be hashable? Which of [1, 2], (1, 2), {1, 2} and "12" can be a key?
+
+Answer:
+Dictionary keys must be hashable so Python can calculate a hash value and use it to find the key efficiently. A key should also remain stable while it is stored in the dictionary.
+
+The list [1, 2] cannot be a key because lists are mutable and unhashable. The tuple (1, 2) can be a key because it contains immutable integers. The set {1, 2} cannot be a key because sets are mutable and unhashable. The string "12" can be a key because strings are immutable and hashable.
+
+Therefore, (1, 2) and "12" can be dictionary keys.
+
+
+3. When would you use d[key], d.get(key) and d.get(key, default)? Give one case from your programs where each is the right choice.
+
+Answer:
+I use d[key] when I expect the key to exist and want to access its value directly. For example, in the student database, if a student ID has already been checked and exists, I can use students[student_id] to access that student's record.
+
+I use d.get(key) when the key might not exist and I want to receive None instead of a KeyError. For example, in the phone directory, I can use contacts.get(name) to check whether a contact exists before displaying its details.
+
+I use d.get(key, default) when I want a specific fallback value if the key is missing. For example, while counting word frequencies, counts.get(word, 0) gives 0 for a word that has not been counted yet.
+
+
+4. Explain the difference between .update() and assigning d[key] = value in a loop. When is .update() cleaner?
+
+Answer:
+The statement d[key] = value assigns or replaces the value for one key. If I need to add or change several entries, I can repeat this statement in a loop. The update() method can add or replace several key-value pairs from another dictionary or another suitable collection in one call.
+
+For example, contacts.update({"Anita": "Pune", "Manoj": "Delhi"}) is cleaner than writing a separate assignment for each entry. I would use update() when I already have several key-value pairs to merge into a dictionary. A loop with d[key] = value is more useful when each value must be calculated or checked individually.
+
+
+5. In Q2, why is "create a new dictionary with a comprehension" safer than modifying salaries in place? When would in-place modification be the better choice?
+
+Answer:
+Creating a new dictionary with a comprehension keeps the original employee salary data unchanged. This is safer when I need to compare the original salaries with the increased salaries, prepare a report, or undo the change easily. It also avoids accidentally changing data that another part of the program still needs.
+
+In-place modification is better when the salary values are supposed to be permanently updated and the original values are no longer needed. It can also avoid creating an extra dictionary, which may be useful when working with a very large amount of data.
+
+
+6. Why does deleting keys while looping over a dictionary fail, and what are two safe ways to do it?
+
+Answer:
+Deleting a key changes the size of the dictionary while Python is iterating over it. This can make the iteration unreliable, so Python raises a RuntimeError.
+
+One safe way is to loop over a separate list of the keys:
+
+for key in list(d):
+    if condition:
+        del d[key]
+
+Another safe way is to create a new dictionary containing only the entries that should remain:
+
+d = {key: value for key, value in d.items() if not condition}
+
+The first method is useful when I want to delete selected entries from the existing dictionary. The second method is useful when I want to build a filtered dictionary.
+
+
+7. In Q3, you needed a member -> books view of data stored as book -> members. Explain how you inverted it and why a list (not a single value) is needed for the new values.
+
+Answer:
+The original library data stored each book with the members who had borrowed it. To create a member-to-books view, I looped through every book and its list of members. For each member, I added the current book to that member's list in a new dictionary.
+
+For example:
+
+member_books = {}
+for book_id, members in books.items():
+    for member in members:
+        member_books.setdefault(member, []).append(book_id)
+
+A list is needed because one member can borrow more than one book. If I stored only one book ID for each member, a later book could overwrite the earlier one and the program would lose information.
+
+
+8. What is the time complexity of looking up a key in a dictionary, and how does this compare with searching a list of records? Use Q5's reverse lookup to explain why building a number -> name dictionary is worthwhile.
+
+Answer:
+A dictionary key lookup takes O(1) time on average. In unusual cases with many hash collisions, it can take O(n). Searching a list of records usually takes O(n) time because the program may need to check each record until it finds a match.
+
+In the phone directory, searching every contact to find the owner of a phone number would take longer as the directory grows. Building a number-to-name dictionary allows the program to find the owner by using the phone number as a key, which takes O(1) time on average. This is worthwhile when reverse lookups are performed repeatedly. Building the reverse dictionary takes extra time and memory, so it is most useful when it will be used for multiple searches.
